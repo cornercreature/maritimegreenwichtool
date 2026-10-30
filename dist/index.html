@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f4f1">
+  <meta name="description" content="A minimal globe, a movable point, and a bearing toward the Royal Observatory at Greenwich. An interactive graphic instrument grounded in spherical navigation.">
+  <title>Greenwich — Bearing Studio</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%232e3593'/%3E%3Cpath d='M10 48L52 16' stroke='white' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='5' fill='white'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <a class="brand" href="./" aria-label="Greenwich home"><svg viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="13" fill="currentColor"/><path d="M5 23L25 7" stroke="white" stroke-width="1.5"/><circle cx="15" cy="15" r="3" fill="white"/></svg><span>Greenwich<span class="brand-period">.</span></span></a>
+    <span class="masthead-caption">A STUDY IN DIRECTION</span>
+    <button class="export-button" id="export" title="Download the artwork as a scalable SVG"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3v10m-4-4 4 4 4-4M4 14v3h12v-3" stroke="currentColor" stroke-width="1.3"/></svg>Export SVG</button>
+  </header>
+
+  <main class="studio">
+    <aside class="controls" aria-label="Globe controls">
+      <div class="intro"><span class="eyebrow">THE BEARING STUDIO</span><h1>One fixed point.<br>Every direction.</h1><p>Move a point around the world.<br>Its bearing returns to Greenwich.</p></div>
+
+      <section class="control-section" aria-labelledby="view-title">
+        <h2 id="view-title"><span>01</span> Globe orientation</h2>
+        <div class="range-control"><div class="range-label"><label for="rotation">Rotation</label><output for="rotation" id="rotation-value">0°</output></div><input id="rotation" type="range" min="-180" max="180" value="0" step="0.1"><div class="range-ends"><span>180° W</span><span>180° E</span></div></div>
+        <div class="range-control"><div class="range-label"><label for="tilt">Tilt</label><output for="tilt" id="tilt-value">0°</output></div><input id="tilt" type="range" min="-90" max="90" value="0" step="0.1"><div class="range-ends"><span>South pole</span><span>North pole</span></div></div>
+      </section>
+
+      <section class="control-section" aria-labelledby="style-title">
+        <h2 id="style-title"><span>02</span> Point &amp; line</h2>
+        <div class="range-control"><div class="range-label"><label for="pointSize">Point size</label><output for="pointSize" id="pointSize-value">42</output></div><input id="pointSize" type="range" min="8" max="90" value="42" step="1"></div>
+        <div class="range-control"><div class="range-label"><label for="lineWidth">Line thickness</label><output for="lineWidth" id="lineWidth-value">10</output></div><input id="lineWidth" type="range" min="1" max="30" value="10" step="0.5"></div>
+        <div class="range-control"><div class="range-label"><label for="lineLength">Line length</label><output for="lineLength" id="lineLength-value">100%</output></div><input id="lineLength" type="range" min="5" max="180" value="100" step="1"><div class="range-ends"><span>Short</span><span>Extended</span></div></div>
+      </section>
+
+      <section class="control-section overlay-section" aria-labelledby="overlay-title">
+        <h2 id="overlay-title"><span>03</span> Optional overlays</h2>
+        <label class="toggle-row" for="grid"><span>Latitude &amp; longitude grid</span><input id="grid" type="checkbox" role="switch"><span class="switch" aria-hidden="true"></span></label>
+        <label class="toggle-row" for="reference"><span>Greenwich reference</span><input id="reference" type="checkbox" role="switch"><span class="switch" aria-hidden="true"></span></label>
+        <label class="toggle-row" for="data"><span>Navigation data</span><input id="data" type="checkbox" role="switch"><span class="switch" aria-hidden="true"></span></label>
+      </section>
+
+      <div class="sidebar-footer"><button id="reset" class="text-button"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.1 5.2A5 5 0 1 1 3 10M3 2v4h4" stroke="currentColor" stroke-width="1.2"/></svg>Reset view &amp; style</button><button id="about" class="about-button" aria-label="About the navigation method" title="About the navigation method">i</button></div>
+    </aside>
+
+    <section class="workspace" aria-label="Interactive globe artwork">
+      <div class="workspace-heading"><span><span class="live-dot"></span> LIVE CANVAS</span><span class="view-label" id="view-label">NORTH UP</span></div>
+      <div class="artboard">
+        <svg id="scene" viewBox="0 0 1000 1000" aria-labelledby="scene-title scene-description">
+          <title id="scene-title">Bearing toward Greenwich</title><desc id="scene-description">A flat blue globe with a movable white point and a straight line through it. Drag or click the globe to move the point. Use the rotation and tilt sliders to reach the far side.</desc>
+          <defs><clipPath id="globe-clip"><circle cx="500" cy="500" r="405"/></clipPath></defs>
+          <circle id="globe" cx="500" cy="500" r="405" fill="#2e3593"/>
+          <g id="grid-layer" clip-path="url(#globe-clip)" fill="none" stroke="#ffffff" stroke-opacity="0.19" stroke-width="1.1" hidden></g>
+          <g id="reference-layer" hidden></g>
+          <line id="bearing-line" stroke="#ffffff" stroke-width="10" stroke-linecap="butt"/>
+          <g id="direction-layer" hidden></g>
+          <circle id="point" r="21" fill="#ffffff" tabindex="0" role="slider" aria-label="Geographic point" aria-valuemin="-90" aria-valuemax="90" aria-valuenow="-10" aria-valuetext="10 degrees south, 25 degrees west. Use arrow keys to move; Shift for larger steps."/>
+        </svg>
+        <div class="return-notice" id="return-notice" hidden><span id="notice-text">Your point is on the far side.</span><button id="find-point">Bring point into view <span aria-hidden="true">↗</span></button></div>
+        <div class="navigation-panel" id="navigation-panel" hidden><span class="eyebrow">TO THE ROYAL OBSERVATORY</span><div class="navigation-readings"><div><span>Latitude</span><strong id="latitude">—</strong></div><div><span>Longitude</span><strong id="longitude">—</strong></div><div><span>True bearing</span><strong id="bearing">—</strong></div><div><span>Distance</span><strong id="distance">—</strong></div></div><p id="navigation-status">Initial great-circle bearing · nautical miles</p></div>
+      </div>
+      <footer class="canvas-footer"><p id="interaction-hint"><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 2v14M2 9h14M6 5l3-3 3 3M6 13l3 3 3-3M5 6 2 9l3 3M13 6l3 3-3 3" stroke="currentColor" stroke-width="1"/></svg>Drag the point. Rotate to explore.</p><span>ROYAL OBSERVATORY · GREENWICH, ENGLAND</span></footer>
+    </section>
+  </main>
+  <dialog id="method-dialog" aria-labelledby="method-title"><button id="close-about" class="dialog-close" aria-label="Close method information">×</button><span class="eyebrow">THE REFERENCE BEHIND THE GRAPHIC</span><h2 id="method-title">A bearing, on a sphere.</h2><p>The white line passes through your point in the local direction of the shortest great-circle route to the Royal Observatory. That direction is projected onto this flat, orthographic view. It need not pass through the Observatory’s on-screen marker: a straight tangent and a curved surface route are different geometries.</p><p>Historic celestial navigation solves a spherical triangle to determine a celestial body’s altitude and azimuth. Marine chronometers supplied Greenwich time for finding longitude. This tool uses related spherical geometry to find a terrestrial bearing; it does not simulate a sextant sight or a celestial line of position.</p><p>The target is the historic Airy Transit Circle, approximately 51.477806° N, 0.001472° W in modern geographic coordinates. The historic Greenwich meridian lies about 102 metres west of GPS zero longitude.</p><p>Rotate and tilt the view to explore both hemispheres. A point behind the globe is hidden until brought back into view. At Greenwich and its antipode the bearing is undefined, so the line is hidden. At the rim a bearing aimed directly into the screen has no visible line direction.</p><p class="method-detail">Line length is a percentage of the globe’s diameter. Point size and stroke thickness use a 1,000-unit artwork canvas. Distance uses the historic spherical convention of 60 nautical miles per degree. At an exact pole, the bearing readout uses the point’s stored longitude as its north reference.</p><div class="source-links"><a href="https://oceanservice.noaa.gov/facts/longitude.html" target="_blank" rel="noopener noreferrer">NOAA: longitude &amp; chronometers ↗</a><a href="https://www.rmg.co.uk/royal-observatory/attractions/airy-transit-circle-telescope" target="_blank" rel="noopener noreferrer">Royal Museums Greenwich: Airy Transit Circle ↗</a><a href="https://thenauticalalmanac.com/2024_Bowditch-_American_Practical_Navigator/Volume_1/05_Volume_1_Part_3_Celestial_Navigation/Part_3_Celestial_Navigation.pdf" target="_blank" rel="noopener noreferrer">Bowditch: celestial navigation ↗</a></div></dialog>
+  <div id="announcement" class="sr-only" role="status" aria-live="polite"></div>
+</body>
+</html>
